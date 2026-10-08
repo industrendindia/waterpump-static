@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowUpRight, Check, ChevronRight, Droplets, Gauge, Menu, Network, Phone, Settings2, ShieldCheck, Waves, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronRight, Droplets, Gauge, Menu, Network, Phone, Settings2, ShieldCheck, Waves, X } from "lucide-react";
 
 const solutions = [
   { icon: Settings2, number: "01", title: "Pump & skid systems", copy: "Integrated pump packages configured around duty point, site conditions and process requirements.", tags: ["Booster systems", "Process skids", "Custom packages"] },
@@ -16,9 +16,29 @@ const markets = [
   { id: "water", label: "Water reuse", title: "More value from every litre", copy: "Treatment, desalination and ZLD support that helps projects recover, monitor and reuse water more intelligently." },
 ];
 
+const products = [
+  { image: "/products/booster-system.jpg", title: "Pressure boosting systems", category: "Packaged systems", copy: "Multi-pump booster packages with integrated controls for stable pressure and efficient demand management." },
+  { image: "/products/vertical-multistage-pump.jpg", title: "Vertical multistage pumps", category: "High-pressure pumping", copy: "Compact, efficient pumping for boosting, process water and building-services applications." },
+  { image: "/products/centrifugal-pump.jpg", title: "Centrifugal pumps", category: "General water transfer", copy: "Versatile end-suction equipment for circulation, transfer and industrial water duties." },
+  { image: "/products/smart-pump.jpg", title: "Intelligent pump control", category: "Connected operation", copy: "Sensor-enabled pumping with variable-speed control for responsive, visible system performance." },
+  { image: "/products/mobile-flood-pump.jpg", title: "Mobile flood-control units", category: "Emergency pumping", copy: "Towable high-flow packages for dewatering, drainage and rapid flood response." },
+  { image: "/products/enclosed-flood-pump.jpg", title: "Enclosed mobile pump sets", category: "Outdoor deployment", copy: "Weather-protected mobile systems for temporary works and demanding field operation." },
+  { image: "/products/self-priming-pumps.jpg", title: "Self-priming pumps", category: "Drainage & wastewater", copy: "Rugged pump sets designed for quick priming and reliable handling of challenging water duties." },
+  { image: "/products/multistage-pump.jpg", title: "Horizontal multistage pumps", category: "Process pumping", copy: "High-head configurations for industrial process, transfer and pressure applications." },
+  { image: "/products/water-meter.jpg", title: "Smart-ready water meters", category: "Measurement", copy: "Accurate consumption measurement prepared for connected monitoring and utility visibility." },
+  { image: "/products/mechanical-water-meter.jpg", title: "Mechanical water meters", category: "Metering", copy: "Durable inline meters for dependable measurement across infrastructure and property networks." },
+];
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [market, setMarket] = useState(markets[0]);
+  const [productIndex, setProductIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const showProduct = (index: number) => setProductIndex((index + products.length) % products.length);
+  useEffect(() => {
+    const timer = window.setInterval(() => setProductIndex(index => (index + 1) % products.length), 5500);
+    return () => window.clearInterval(timer);
+  }, []);
   return (
     <main>
       <header className="site-header">
@@ -29,7 +49,7 @@ export default function Home() {
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation" aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
       </header>
 
-      <section className="hero" id="top"><div className="hero-backdrop" aria-hidden="true" /><div className="water-light" aria-hidden="true" />
+      <section className="hero" id="top"><div className="hero-backdrop" aria-hidden="true" /><div className="water-light" aria-hidden="true" /><div className="flow-stream" aria-hidden="true"><i /><i /><i /></div>
         <div className="hero-content"><p className="eyebrow light"><span /> Integrated water engineering</p><h1>Move water.<br /><em>Build certainty.</em></h1><p className="hero-copy">Engineered pump systems, treatment, metering and digital solutions for demanding infrastructure and industry.</p>
           <div className="hero-actions"><a className="button primary" href="#contact">Start a project <ArrowUpRight size={18} /></a><a className="button ghost" href="#solutions">Explore solutions</a></div>
           <div className="hero-proof"><div><strong>End-to-end</strong><span>Engineering & supply</span></div><div><strong>Application-led</strong><span>Built around site needs</span></div><div><strong>Lifecycle</strong><span>Parts, retrofit & support</span></div></div>
@@ -40,6 +60,16 @@ export default function Home() {
 
       <section className="solutions section-pad" id="solutions"><div className="section-heading"><div><p className="eyebrow"><span /> Core solutions</p><h2>Engineering around<br />your application</h2></div><p>From a single duty point to a connected water network, each solution starts with how the system must perform.</p></div>
         <div className="solution-grid">{solutions.map((item) => { const Icon = item.icon; return <article className="solution-card" key={item.number}><div className="card-top"><Icon /><span>{item.number}</span></div><h3>{item.title}</h3><p>{item.copy}</p><ul>{item.tags.map(tag => <li key={tag}><Check size={14} />{tag}</li>)}</ul><a href="#contact" aria-label={`Enquire about ${item.title}`}>Discuss this solution <ChevronRight size={17} /></a></article>; })}</div>
+      </section>
+
+      <section className="product-showcase section-pad" aria-labelledby="showcase-title">
+        <div className="showcase-heading"><div><p className="eyebrow light"><span /> Equipment showcase</p><h2 id="showcase-title">Real equipment.<br />Ready for real duties.</h2></div><div className="showcase-counter"><strong>{String(productIndex + 1).padStart(2, "0")}</strong><span>/ {String(products.length).padStart(2, "0")}</span></div></div>
+        <div className="showcase-stage" onTouchStart={event => setTouchStart(event.touches[0].clientX)} onTouchEnd={event => { if (touchStart === null) return; const distance = event.changedTouches[0].clientX - touchStart; if (Math.abs(distance) > 45) showProduct(productIndex + (distance < 0 ? 1 : -1)); setTouchStart(null); }}>
+          <div className="product-visual"><img src={products[productIndex].image} alt={products[productIndex].title} /><div className="product-water" aria-hidden="true"><span /><span /><span /></div></div>
+          <div className="product-details"><p>{products[productIndex].category}</p><h3>{products[productIndex].title}</h3><div className="title-rule" /><p className="product-description">{products[productIndex].copy}</p><a href="#contact">Specify your requirement <ChevronRight size={17} /></a></div>
+          <div className="showcase-controls"><button onClick={() => showProduct(productIndex - 1)} aria-label="Previous equipment"><ArrowLeft /></button><button onClick={() => showProduct(productIndex + 1)} aria-label="Next equipment"><ArrowRight /></button></div>
+        </div>
+        <div className="showcase-dots" role="tablist" aria-label="Equipment gallery">{products.map((product, index) => <button key={product.title} className={index === productIndex ? "active" : ""} onClick={() => showProduct(index)} aria-label={`Show ${product.title}`} aria-selected={index === productIndex} role="tab"><span /></button>)}</div>
       </section>
 
       <section className="market-section section-pad"><div className="market-copy"><p className="eyebrow light"><span /> Application focus</p><h2>Different environments.<br />One rigorous approach.</h2><div className="market-tabs" role="tablist" aria-label="Applications">{markets.map(item => <button key={item.id} className={market.id === item.id ? "active" : ""} onClick={() => setMarket(item)}>{item.label}</button>)}</div></div><div className="market-detail"><Network size={28} /><p className="detail-index">0{markets.findIndex(item => item.id === market.id) + 1} / 03</p><h3>{market.title}</h3><p>{market.copy}</p></div></section>
