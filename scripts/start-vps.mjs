@@ -1,9 +1,11 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
+import path from "node:path";
 
 const rawPort = process.env.WATERPUMP_PORT ?? "";
 const port = Number(rawPort);
 const host = process.env.WATERPUMP_HOST ?? "127.0.0.1";
+const runtimeRoot = process.env.SITES_RUNTIME_ROOT ?? ".wrangler";
 
 if (!Number.isInteger(port) || port < 1024 || port > 65535) {
   console.error("WATERPUMP_PORT must be an unused TCP port between 1024 and 65535.");
@@ -37,7 +39,7 @@ const child = spawn(
     "--inspector-port",
     "0",
     "--persist-to",
-    ".wrangler/state",
+    path.join(runtimeRoot, "wrangler-state"),
   ],
   { stdio: "inherit", env: process.env },
 );

@@ -50,11 +50,13 @@ pnpm_bin="$tools_root/node_modules/.bin/pnpm"
 sudo -u waterpump env HOME=/srv/waterpump-static "$pnpm_bin" install --frozen-lockfile
 sudo -u waterpump env HOME=/srv/waterpump-static "$pnpm_bin" build
 test -f dist/server/index.js
+install -d -o waterpump -g waterpump "$app_root/dist/server/.wrangler"
 
 sed "s/__WATERPUMP_PORT__/$port/g" deploy/waterpump-static.service.template > /etc/systemd/system/$service_name
 systemctl daemon-reload
 systemctl enable --now "$service_name"
 
 sleep 2
-curl --fail --silent --show-error "http://127.0.0.1:$port/" >/dev/null
+curl --fail --silent --show-error --connect-timeout 5 --max-time 15 \
+  "http://127.0.0.1:$port/" >/dev/null
 echo "PASS: waterpump-static is isolated on TCP port $port"

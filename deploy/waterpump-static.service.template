@@ -20,6 +20,7 @@ PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
 ReadWritePaths=/srv/waterpump-static/runtime
+ReadWritePaths=/srv/waterpump-static/app/dist/server/.wrangler
 
 [Install]
 WantedBy=multi-user.target
