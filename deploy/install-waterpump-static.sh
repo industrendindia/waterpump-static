@@ -41,7 +41,11 @@ if (( node_major < 22 )); then
 fi
 
 id -u waterpump >/dev/null 2>&1 || useradd --system --home-dir /srv/waterpump-static --shell /usr/sbin/nologin waterpump
-install -d -o waterpump -g waterpump /srv/waterpump-static/runtime "$tools_root"
+install -d -o waterpump -g waterpump \
+  /srv/waterpump-static/runtime \
+  /srv/waterpump-static/runtime/home \
+  /srv/waterpump-static/runtime/config \
+  "$tools_root"
 
 chown -R waterpump:waterpump /srv/waterpump-static
 sudo -u waterpump env HOME=/srv/waterpump-static npm install \
