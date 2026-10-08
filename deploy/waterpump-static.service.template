@@ -1,0 +1,25 @@
+[Unit]
+Description=GJVN waterpump static website
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=waterpump
+Group=waterpump
+WorkingDirectory=/srv/waterpump-static/app
+Environment=NODE_ENV=production
+Environment=WATERPUMP_PORT=__WATERPUMP_PORT__
+Environment=WATERPUMP_HOST=0.0.0.0
+Environment=SITES_RUNTIME_ROOT=/srv/waterpump-static/runtime
+ExecStart=/usr/bin/env pnpm start:vps
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/waterpump-static/runtime
+
+[Install]
+WantedBy=multi-user.target
