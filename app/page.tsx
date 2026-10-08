@@ -49,11 +49,11 @@ export default function Home() {
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation" aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
       </header>
 
-      <section className="hero" id="top"><div className="hero-backdrop" aria-hidden="true" /><div className="water-light" aria-hidden="true" /><div className="live-water-scene" aria-hidden="true"><span className="outlet-flow" /><span className="water-spray spray-one" /><span className="water-spray spray-two" /><span className="surface-current current-one" /><span className="surface-current current-two" /><span className="surface-current current-three" /></div><div className="flow-stream" aria-hidden="true"><i /><i /><i /></div>
+      <section className="hero" id="top"><div className="hero-backdrop" aria-hidden="true" /><div className="water-light" aria-hidden="true" /><div className="flow-stream" aria-hidden="true"><i /><i /><i /></div>
         <div className="hero-content"><p className="eyebrow light"><span /> Integrated water engineering</p><h1>Move water.<br /><em>Build certainty.</em></h1><p className="hero-copy">Engineered pump systems, treatment, metering and digital solutions for demanding infrastructure and industry.</p>
           <div className="hero-actions"><a className="button primary" href="#contact">Start a project <ArrowUpRight size={18} /></a><a className="button ghost" href="#solutions">Explore solutions</a></div>
           <div className="hero-proof"><div><strong>End-to-end</strong><span>Engineering & supply</span></div><div><strong>Application-led</strong><span>Built around site needs</span></div><div><strong>Lifecycle</strong><span>Parts, retrofit & support</span></div></div>
-        </div><div className="live-water-badge" aria-label="Animated water scene"><span /> Live water flow</div><a href="#solutions" className="scroll-cue">Scroll to explore <span>↓</span></a>
+        </div><a href="#solutions" className="scroll-cue">Scroll to explore <span>↓</span></a>
       </section>
 
       <section className="intro section-pad"><div className="section-label">What we solve</div><div className="intro-copy"><h2>One partner across the <span>water engineering lifecycle.</span></h2><p>GJVN connects equipment, controls and engineering support into practical systems—so project teams can move from requirement to reliable operation with fewer hand-offs.</p></div></section>
