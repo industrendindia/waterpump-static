@@ -1,87 +1,84 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronRight, Droplets, Gauge, Menu, Network, Phone, Settings2, ShieldCheck, Waves, X } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
+import { ArrowLeft, ArrowRight, Check, ChevronRight, CircuitBoard, Droplets, Gauge, Mail, Menu, Phone, Settings2, ShieldCheck, Sparkles, Waves, X, Zap } from "lucide-react";
 
 const solutions = [
-  { icon: Settings2, number: "01", title: "Pump & skid systems", copy: "Integrated pump packages configured around duty point, site conditions and process requirements.", tags: ["Booster systems", "Process skids", "Custom packages"] },
-  { icon: Gauge, number: "02", title: "Metering & IoT", copy: "Connected water measurement for clearer consumption data, remote visibility and smarter infrastructure.", tags: ["Smart meters", "Remote monitoring", "Data integration"] },
-  { icon: Droplets, number: "03", title: "Water & wastewater", copy: "Treatment solutions supported by automation and digitalization for dependable day-to-day operation.", tags: ["Treatment systems", "Automation", "Process support"] },
-  { icon: Waves, number: "04", title: "Desalination & ZLD", copy: "Application support for desalination and zero liquid discharge across demanding industrial environments.", tags: ["RO systems", "Water recovery", "ZLD applications"] },
-];
-
-const markets = [
-  { id: "industry", label: "Industry", title: "Built for continuous-duty operations", copy: "Engineered pumping, treatment and monitoring packages aligned to production uptime, water quality and lifecycle cost." },
-  { id: "infrastructure", label: "Infrastructure", title: "Designed around the wider system", copy: "Coordinated equipment and control packages for utilities, buildings, irrigation and community-scale water networks." },
-  { id: "water", label: "Water reuse", title: "More value from every litre", copy: "Treatment, desalination and ZLD support that helps projects recover, monitor and reuse water more intelligently." },
+  { icon: Settings2, number: "01", title: "Pump & Skid Systems", copy: "Integrated pump and skid-based engineering solutions configured around project, process and performance requirements.", tags: ["Booster packages", "Process skids", "Custom integration"] },
+  { icon: Gauge, number: "02", title: "Water Meter & IoT", copy: "Water metering combined with connected technologies for measurement, visibility and smarter infrastructure.", tags: ["Smart metering", "Remote visibility", "Data integration"] },
+  { icon: Droplets, number: "03", title: "Water & Wastewater", copy: "Treatment solutions supported by digitalization for dependable operation and improved process visibility.", tags: ["Treatment systems", "Automation", "Process support"] },
+  { icon: Waves, number: "04", title: "Desalination & ZLD", copy: "Solution support for desalination and Zero Liquid Discharge applications across demanding industrial requirements.", tags: ["RO systems", "Water recovery", "ZLD applications"] },
 ];
 
 const products = [
-  { image: "/products/booster-system.jpg", title: "Pressure boosting systems", category: "Packaged systems", copy: "Multi-pump booster packages with integrated controls for stable pressure and efficient demand management." },
+  { image: "/products/booster-system.jpg", title: "Pressure boosting systems", category: "Packaged systems", copy: "Integrated multi-pump packages with intelligent controls for stable pressure and efficient demand management." },
   { image: "/products/vertical-multistage-pump.jpg", title: "Vertical multistage pumps", category: "High-pressure pumping", copy: "Compact, efficient pumping for boosting, process water and building-services applications." },
-  { image: "/products/centrifugal-pump.jpg", title: "Centrifugal pumps", category: "General water transfer", copy: "Versatile end-suction equipment for circulation, transfer and industrial water duties." },
-  { image: "/products/smart-pump.jpg", title: "Intelligent pump control", category: "Connected operation", copy: "Sensor-enabled pumping with variable-speed control for responsive, visible system performance." },
+  { image: "/products/centrifugal-pump.jpg", title: "Centrifugal pumps", category: "Water transfer", copy: "Versatile end-suction equipment for circulation, transfer and continuous industrial duties." },
+  { image: "/products/smart-pump.jpg", title: "Intelligent pump control", category: "Connected operation", copy: "Sensor-enabled pumping with variable-speed control for visible, responsive performance." },
   { image: "/products/mobile-flood-pump.jpg", title: "Mobile flood-control units", category: "Emergency pumping", copy: "Towable high-flow packages for dewatering, drainage and rapid flood response." },
-  { image: "/products/enclosed-flood-pump.jpg", title: "Enclosed mobile pump sets", category: "Outdoor deployment", copy: "Weather-protected mobile systems for temporary works and demanding field operation." },
-  { image: "/products/self-priming-pumps.jpg", title: "Self-priming pumps", category: "Drainage & wastewater", copy: "Rugged pump sets designed for quick priming and reliable handling of challenging water duties." },
-  { image: "/products/multistage-pump.jpg", title: "Horizontal multistage pumps", category: "Process pumping", copy: "High-head configurations for industrial process, transfer and pressure applications." },
-  { image: "/products/water-meter.jpg", title: "Smart-ready water meters", category: "Measurement", copy: "Accurate consumption measurement prepared for connected monitoring and utility visibility." },
-  { image: "/products/mechanical-water-meter.jpg", title: "Mechanical water meters", category: "Metering", copy: "Durable inline meters for dependable measurement across infrastructure and property networks." },
+  { image: "/products/self-priming-pumps.jpg", title: "Self-priming pumps", category: "Drainage & wastewater", copy: "Rugged pump sets designed for fast priming and dependable handling of demanding water duties." },
+];
+
+const process = [
+  ["01", "Understand", "Application, site and performance requirements."],
+  ["02", "Engineer & customize", "The right equipment and solution architecture."],
+  ["03", "Source & integrate", "Suitable components brought into one project solution."],
+  ["04", "Support & upgrade", "Parts, retrofits and modernization for longer asset value."],
+];
+
+const services = [
+  ["01", "Sourcing & supply", "Coordinated access to fit-for-purpose water equipment."],
+  ["02", "Customized solutions", "Packages designed around application and site needs."],
+  ["03", "Spare parts", "Practical parts support for installed equipment."],
+  ["04", "Retrofits", "Upgrades that improve performance and extend asset life."],
 ];
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [market, setMarket] = useState(markets[0]);
   const [productIndex, setProductIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
   const showProduct = (index: number) => setProductIndex((index + products.length) % products.length);
+
   useEffect(() => {
-    const timer = window.setInterval(() => setProductIndex(index => (index + 1) % products.length), 5500);
+    const timer = window.setInterval(() => setProductIndex((index) => (index + 1) % products.length), 6000);
     return () => window.clearInterval(timer);
   }, []);
-  return (
-    <main>
-      <header className="site-header">
-        <a href="#top" className="brand" aria-label="GJVN home"><span className="brand-mark">G</span><span className="brand-name">GJVN<small>Water & Engineering</small></span></a>
-        <nav className={menuOpen ? "nav open" : "nav"} aria-label="Main navigation">
-          <a href="#solutions" onClick={() => setMenuOpen(false)}>Solutions</a><a href="#approach" onClick={() => setMenuOpen(false)}>Approach</a><a href="#services" onClick={() => setMenuOpen(false)}>Services</a><a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a><a className="nav-cta" href="mailto:sales@gjvnengineering.com">Discuss a project</a>
-        </nav>
-        <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation" aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
-      </header>
 
-      <section className="hero" id="top"><div className="hero-backdrop" aria-hidden="true" /><div className="water-light" aria-hidden="true" /><div className="flow-stream" aria-hidden="true"><i /><i /><i /></div>
-        <div className="hero-content"><p className="eyebrow light"><span /> Integrated water engineering</p><h1>Move water.<br /><em>Build certainty.</em></h1><p className="hero-copy">Engineered pump systems, treatment, metering and digital solutions for demanding infrastructure and industry.</p>
-          <div className="hero-actions"><a className="button primary" href="#contact">Start a project <ArrowUpRight size={18} /></a><a className="button ghost" href="#solutions">Explore solutions</a></div>
-          <div className="hero-proof"><div><strong>End-to-end</strong><span>Engineering & supply</span></div><div><strong>Application-led</strong><span>Built around site needs</span></div><div><strong>Lifecycle</strong><span>Parts, retrofit & support</span></div></div>
-        </div><a href="#solutions" className="scroll-cue">Scroll to explore <span>↓</span></a>
-      </section>
+  const sendEnquiry = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const subject = encodeURIComponent(`Project enquiry — ${form.get("company") || form.get("name")}`);
+    const body = encodeURIComponent(`Name: ${form.get("name")}\nCompany: ${form.get("company")}\nEmail: ${form.get("email")}\nPhone: ${form.get("phone")}\n\nRequirement:\n${form.get("requirement")}`);
+    window.location.href = `mailto:sales@gjvnengineering.com?subject=${subject}&body=${body}`;
+  };
 
-      <section className="intro section-pad"><div className="section-label">What we solve</div><div className="intro-copy"><h2>One partner across the <span>water engineering lifecycle.</span></h2><p>GJVN connects equipment, controls and engineering support into practical systems—so project teams can move from requirement to reliable operation with fewer hand-offs.</p></div></section>
+  return <main>
+    <header className="site-header">
+      <a href="#top" className="brand" aria-label="GJVN home"><span className="brand-logo"><img src="/gjvn-logo.png" alt="" /></span><span className="brand-copy"><strong>GJVN</strong><small>Water • Engineering • Digitalization</small></span></a>
+      <nav className={menuOpen ? "nav open" : "nav"} aria-label="Main navigation"><a href="#about" onClick={() => setMenuOpen(false)}>About</a><a href="#solutions" onClick={() => setMenuOpen(false)}>Solutions</a><a href="#approach" onClick={() => setMenuOpen(false)}>Approach</a><a href="#services" onClick={() => setMenuOpen(false)}>Services</a><a className="nav-cta" href="#contact" onClick={() => setMenuOpen(false)}>Discuss a project</a></nav>
+      <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation">{menuOpen ? <X /> : <Menu />}</button>
+    </header>
 
-      <section className="solutions section-pad" id="solutions"><div className="section-heading"><div><p className="eyebrow"><span /> Core solutions</p><h2>Engineering around<br />your application</h2></div><p>From a single duty point to a connected water network, each solution starts with how the system must perform.</p></div>
-        <div className="solution-grid">{solutions.map((item) => { const Icon = item.icon; return <article className="solution-card" key={item.number}><div className="card-top"><Icon /><span>{item.number}</span></div><h3>{item.title}</h3><p>{item.copy}</p><ul>{item.tags.map(tag => <li key={tag}><Check size={14} />{tag}</li>)}</ul><a href="#contact" aria-label={`Enquire about ${item.title}`}>Discuss this solution <ChevronRight size={17} /></a></article>; })}</div>
-      </section>
+    <section className="hero" id="top"><div className="hero-photo" aria-hidden="true" /><div className="hero-orbit orbit-one" aria-hidden="true" /><div className="hero-orbit orbit-two" aria-hidden="true" /><div className="hero-grid" aria-hidden="true" />
+      <div className="hero-content"><div className="hero-kicker"><span><Sparkles size={14} /> Integrated water intelligence</span><i>01 / GJVN</i></div><h1>Engineering the<br /><em>flow of progress.</em></h1><p>Integrated pump systems, metering, treatment and digital solutions that turn complex water requirements into dependable infrastructure.</p><div className="hero-actions"><a className="button button-lime" href="#solutions">Explore solutions</a><a className="button button-glass" href="#contact">Discuss a project</a></div><div className="hero-trust"><span><ShieldCheck size={17} /> Application-led engineering</span><span><CircuitBoard size={17} /> Digital-ready systems</span><span><Zap size={17} /> Lifecycle support</span></div></div>
+      <div className="hero-console" aria-hidden="true"><span>System status</span><strong>FLOW / OPTIMAL</strong><div><i /><i /><i /><i /><i /></div></div><a className="scroll-pill" href="#about">Discover GJVN <ChevronRight size={16} /></a>
+    </section>
 
-      <section className="product-showcase section-pad" aria-labelledby="showcase-title">
-        <div className="showcase-heading"><div><p className="eyebrow light"><span /> Equipment showcase</p><h2 id="showcase-title">Real equipment.<br />Ready for real duties.</h2></div><div className="showcase-counter"><strong>{String(productIndex + 1).padStart(2, "0")}</strong><span>/ {String(products.length).padStart(2, "0")}</span></div></div>
-        <div className="showcase-stage" onTouchStart={event => setTouchStart(event.touches[0].clientX)} onTouchEnd={event => { if (touchStart === null) return; const distance = event.changedTouches[0].clientX - touchStart; if (Math.abs(distance) > 45) showProduct(productIndex + (distance < 0 ? 1 : -1)); setTouchStart(null); }}>
-          <div className="product-visual"><img src={products[productIndex].image} alt={products[productIndex].title} /><div className="product-water" aria-hidden="true"><span /><span /><span /></div></div>
-          <div className="product-details"><p>{products[productIndex].category}</p><h3>{products[productIndex].title}</h3><div className="title-rule" /><p className="product-description">{products[productIndex].copy}</p><a href="#contact">Specify your requirement <ChevronRight size={17} /></a></div>
-          <div className="showcase-controls"><button onClick={() => showProduct(productIndex - 1)} aria-label="Previous equipment"><ArrowLeft /></button><button onClick={() => showProduct(productIndex + 1)} aria-label="Next equipment"><ArrowRight /></button></div>
-        </div>
-        <div className="showcase-dots" role="tablist" aria-label="Equipment gallery">{products.map((product, index) => <button key={product.title} className={index === productIndex ? "active" : ""} onClick={() => showProduct(index)} aria-label={`Show ${product.title}`} aria-selected={index === productIndex} role="tab"><span /></button>)}</div>
-      </section>
+    <section className="marquee" aria-label="GJVN capabilities"><div>SMART PUMPING <span>✦</span> WATER TREATMENT <span>✦</span> DIGITAL METERING <span>✦</span> DESALINATION <span>✦</span> ZERO LIQUID DISCHARGE <span>✦</span> ENGINEERING SUPPORT <span>✦</span></div></section>
 
-      <section className="market-section section-pad"><div className="market-copy"><p className="eyebrow light"><span /> Application focus</p><h2>Different environments.<br />One rigorous approach.</h2><div className="market-tabs" role="tablist" aria-label="Applications">{markets.map(item => <button key={item.id} className={market.id === item.id ? "active" : ""} onClick={() => setMarket(item)}>{item.label}</button>)}</div></div><div className="market-detail"><Network size={28} /><p className="detail-index">0{markets.findIndex(item => item.id === market.id) + 1} / 03</p><h3>{market.title}</h3><p>{market.copy}</p></div></section>
+    <section className="about section-pad" id="about"><div className="about-label"><span>About GJVN</span><strong>ENGINEERING<br />+ WATER<br />+ DIGITAL</strong></div><div className="about-main"><p className="eyebrow">One connected partner</p><h2>One partner across the <em>water engineering lifecycle.</em></h2><p className="lead">GJVN brings engineering, equipment, integration and modernization together—so project teams move from requirement to reliable operation with fewer hand-offs.</p><div className="about-stats"><div><strong>360°</strong><span>System perspective</span></div><div><strong>04</strong><span>Core solution areas</span></div><div><strong>01</strong><span>Coordinated partner</span></div></div></div></section>
 
-      <section className="approach section-pad" id="approach"><div className="section-heading"><div><p className="eyebrow"><span /> Integrated approach</p><h2>From requirement<br />to working solution</h2></div><p>Clear stages make technical decisions easier, responsibilities visible and delivery more predictable.</p></div><div className="steps">{[["01","Define","Duty point, water quality, site conditions and performance goals."],["02","Engineer","Select, size and integrate equipment, controls and connections."],["03","Deliver","Source, assemble and coordinate the solution for project needs."],["04","Support","Maintain performance with parts, upgrades and retrofit support."]].map(([n,t,c]) => <article key={n}><span>{n}</span><div className="step-dot" /><h3>{t}</h3><p>{c}</p></article>)}</div></section>
+    <section className="solutions section-pad" id="solutions"><div className="section-head"><div><p className="eyebrow light">Core solutions</p><h2>Built around your application.<br /><em>Not a catalogue.</em></h2></div><p>From equipment packages to intelligent water management, each solution starts with the duty, environment and outcome.</p></div><div className="solution-grid">{solutions.map((item) => { const Icon = item.icon; return <article className="solution-card" key={item.number}><div className="solution-glow" /><div className="solution-top"><Icon /><span>{item.number}</span></div><h3>{item.title}</h3><p>{item.copy}</p><ul>{item.tags.map((tag) => <li key={tag}><Check size={14} />{tag}</li>)}</ul><a href="#contact">Shape this solution <ChevronRight size={16} /></a></article>; })}</div></section>
 
-      <section className="services section-pad" id="services"><div className="services-title"><p className="eyebrow light"><span /> Beyond equipment</p><h2>Support that keeps<br />projects moving.</h2></div><div className="service-list">{[["01","Sourcing & supply","Coordinated access to fit-for-purpose water equipment."],["02","Customized solutions","Packages configured around application and site needs."],["03","Spare parts","Practical parts support for installed equipment."],["04","Retrofits","Upgrades that improve performance and extend asset life."]].map(([n,t,c]) => <div className="service-row" key={n}><span>{n}</span><h3>{t}</h3><p>{c}</p><ArrowUpRight /></div>)}</div></section>
+    <section className="equipment section-pad" aria-labelledby="equipment-title"><div className="equipment-copy"><p className="eyebrow">Equipment intelligence</p><h2 id="equipment-title">Real equipment.<br /><em>Precisely applied.</em></h2><p>{products[productIndex].copy}</p><div className="equipment-meta"><span>{products[productIndex].category}</span><strong>{products[productIndex].title}</strong></div><div className="equipment-controls"><button onClick={() => showProduct(productIndex - 1)} aria-label="Previous product"><ArrowLeft /></button><span>{String(productIndex + 1).padStart(2, "0")} / {String(products.length).padStart(2, "0")}</span><button onClick={() => showProduct(productIndex + 1)} aria-label="Next product"><ArrowRight /></button></div></div><div className="equipment-visual"><div className="visual-ring" aria-hidden="true" /><img key={products[productIndex].image} src={products[productIndex].image} alt={products[productIndex].title} /><span className="spec-chip chip-one">Engineered duty</span><span className="spec-chip chip-two">Integrated control</span></div><div className="equipment-rail">{products.map((product, index) => <button key={product.title} onClick={() => showProduct(index)} className={index === productIndex ? "active" : ""}><img src={product.image} alt="" /><span>{product.title}</span></button>)}</div></section>
 
-      <section className="trust section-pad"><div className="trust-icon"><ShieldCheck /></div><h2>Technical clarity at every stage.</h2><p>We bring the system view—equipment selection, integration, performance and ongoing support—so decisions are grounded in the full application.</p><div className="trust-points"><span>Application-first</span><span>Vendor-neutral sourcing</span><span>Single-point coordination</span></div></section>
+    <section className="approach section-pad" id="approach"><div className="approach-intro"><p className="eyebrow light">Integrated approach</p><h2>From requirement<br />to working solution.</h2><p>A clear, accountable path connecting technical decisions, equipment and long-term performance.</p></div><div className="process">{process.map(([number, title, copy], index) => <article key={number}><div className="process-number"><span>{number}</span><i>{index < process.length - 1 ? "→" : "✓"}</i></div><h3>{title}</h3><p>{copy}</p></article>)}</div></section>
 
-      <section className="contact section-pad" id="contact"><div className="contact-main"><p className="eyebrow light"><span /> Contact GJVN</p><h2>Bring us your<br /><em>water challenge.</em></h2><p>Tell us the application, flow, head, water quality or project stage. We’ll help shape the next technical step.</p><a className="button lime" href="mailto:sales@gjvnengineering.com">Email project details <ArrowUpRight size={18} /></a></div><div className="contact-card"><p>Talk directly with our team</p><a href="tel:+919876543210"><Phone size={18} /> +91 98765 43210</a><a href="mailto:info@gjvnengineering.com">info@gjvnengineering.com</a><a href="mailto:sales@gjvnengineering.com">sales@gjvnengineering.com</a><address>Baner Road, Pune<br />Maharashtra 411045, India</address></div></section>
-      <footer><div className="brand inverse"><span className="brand-mark">G</span><span className="brand-name">GJVN<small>Water & Engineering</small></span></div><p>Integrated water, engineering and digitalization solutions.</p><span>© {new Date().getFullYear()} GJVN. All rights reserved.</span></footer>
-    </main>
-  );
+    <section className="services section-pad" id="services"><div className="services-title"><p className="eyebrow">Beyond equipment</p><h2>Support that keeps<br /><em>projects moving.</em></h2><p>Practical capability from specification through modernization.</p></div><div className="service-list">{services.map(([number, title, copy]) => <a href="#contact" className="service-row" key={number}><span>{number}</span><h3>{title}</h3><p>{copy}</p><ChevronRight /></a>)}</div></section>
+
+    <section className="contact section-pad" id="contact"><div className="contact-copy"><p className="eyebrow light">Contact GJVN</p><h2>Let’s engineer<br /><em>what flows next.</em></h2><p>Share your application, flow, head, water quality or project stage. Our team will help shape the next technical step.</p><div className="contact-details"><a href="tel:+919876543210"><Phone /><span><small>Mobile</small>+91 98765 43210</span></a><a href="mailto:info@gjvnengineering.com"><Mail /><span><small>Email</small>info@gjvnengineering.com</span></a></div><address>Office No. 402, Business Avenue,<br />Baner Road, Pune, Maharashtra 411045, India<br /><small>Monday – Saturday | 9:30 AM – 6:30 PM</small></address></div>
+      <form className="enquiry" onSubmit={sendEnquiry}><div className="form-head"><span>Project enquiry</span><strong>Tell us what you need.</strong></div><label>Name<input required name="name" placeholder="Your name" /></label><label>Company<input name="company" placeholder="Company name" /></label><label>Email<input required type="email" name="email" placeholder="name@company.com" /></label><label>Phone<input name="phone" placeholder="Contact number" /></label><label className="full">Requirement<textarea required name="requirement" placeholder="Application, flow, head, water quality, timeline..." /></label><button className="button button-lime" type="submit">Prepare email enquiry</button><small>This opens your email app with the project details prepared.</small></form>
+    </section>
+
+    <footer><div className="footer-brand"><span className="brand-logo"><img src="/gjvn-logo.png" alt="GJVN" /></span><p>Integrated water, engineering and digitalization solutions.</p></div><div><strong>Solutions</strong><a href="#solutions">Pump & Skid Systems</a><a href="#solutions">Water Meter & IoT</a><a href="#solutions">Water & Wastewater</a><a href="#solutions">Desalination & ZLD</a></div><div><strong>Connect</strong><a href="mailto:info@gjvnengineering.com">info@gjvnengineering.com</a><a href="tel:+919876543210">+91 98765 43210</a><span>Baner Road, Pune</span></div><p className="copyright">© {new Date().getFullYear()} GJVN Engineering Solutions Pvt. Ltd. All rights reserved. Demo contact details shown for website visualization.</p></footer>
+  </main>;
 }
