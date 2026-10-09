@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, ChevronRight, CircuitBoard, Droplets, Gauge, Mail, Menu, Phone, Send, Settings2, ShieldCheck, Sparkles, Waves, X, Zap } from "lucide-react";
 
 const heroScenes = [
@@ -50,7 +50,24 @@ export default function Home() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [heroScene, setHeroScene] = useState(0);
   const [whatsappOpen, setWhatsappOpen] = useState(false);
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
   const showProduct = (index: number) => setProductIndex((index + products.length) % products.length);
+
+  const startProductSwipe = (event: ReactPointerEvent<HTMLDivElement>) => {
+    swipeStart.current = { x: event.clientX, y: event.clientY };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const finishProductSwipe = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const start = swipeStart.current;
+    swipeStart.current = null;
+    if (!start) return;
+    const deltaX = event.clientX - start.x;
+    const deltaY = event.clientY - start.y;
+    if (Math.abs(deltaX) > 42 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15) {
+      showProduct(productIndex + (deltaX < 0 ? 1 : -1));
+    }
+  };
 
   useEffect(() => {
     const timer = window.setInterval(() => setProductIndex((index) => (index + 1) % products.length), 6000);
@@ -124,7 +141,7 @@ export default function Home() {
 
     <section className="solutions section-pad" id="solutions" data-reveal><div className="section-head"><div><p className="eyebrow light">Core solutions</p><h2>Built around your application.<br /><em>Not a catalogue.</em></h2></div><p>From equipment packages to intelligent water management, each solution starts with the duty, environment and outcome.</p></div><div className="solution-grid">{solutions.map((item) => { const Icon = item.icon; return <article className="solution-card" key={item.number}><div className="solution-image"><img src={item.image} alt="" /><span><Icon /> {item.number}</span></div><div className="solution-body"><h3>{item.title}</h3><p>{item.copy}</p><ul>{item.tags.map((tag) => <li key={tag}><Check size={14} />{tag}</li>)}</ul><a href="#contact">Shape this solution <ChevronRight size={16} /></a></div></article>; })}</div></section>
 
-    <section className="equipment section-pad" aria-labelledby="equipment-title" data-reveal><div className="equipment-copy"><p className="eyebrow">Equipment intelligence</p><h2 id="equipment-title">Real equipment.<br /><em>Precisely applied.</em></h2><p>{products[productIndex].copy}</p><div className="equipment-meta"><span>{products[productIndex].category}</span><strong>{products[productIndex].title}</strong></div><div className="equipment-controls"><button onClick={() => showProduct(productIndex - 1)} aria-label="Previous product"><ArrowLeft /></button><span>{String(productIndex + 1).padStart(2, "0")} / {String(products.length).padStart(2, "0")}</span><button onClick={() => showProduct(productIndex + 1)} aria-label="Next product"><ArrowRight /></button></div></div><div className="equipment-visual"><div className="visual-ring" aria-hidden="true" /><div className="energy-sweep" aria-hidden="true" /><img key={products[productIndex].image} src={products[productIndex].image} alt={products[productIndex].title} /><span className="spec-chip chip-one">Engineered duty</span><span className="spec-chip chip-two">Integrated control</span></div><div className="equipment-rail">{products.map((product, index) => <button key={product.title} onClick={() => showProduct(index)} className={index === productIndex ? "active" : ""}><img src={product.image} alt="" /><span>{product.title}</span></button>)}</div></section>
+    <section className="equipment section-pad" aria-labelledby="equipment-title" data-reveal><div className="equipment-copy"><p className="eyebrow">Equipment intelligence</p><h2 id="equipment-title">Real equipment.<br /><em>Precisely applied.</em></h2><p>{products[productIndex].copy}</p><div className="equipment-meta"><span>{products[productIndex].category}</span><strong>{products[productIndex].title}</strong></div><div className="equipment-controls"><button onClick={() => showProduct(productIndex - 1)} aria-label="Previous product"><ArrowLeft /></button><span>{String(productIndex + 1).padStart(2, "0")} / {String(products.length).padStart(2, "0")}</span><button onClick={() => showProduct(productIndex + 1)} aria-label="Next product"><ArrowRight /></button></div></div><div className="equipment-visual" role="region" aria-label={`${products[productIndex].title}. Swipe or drag left and right to browse products.`} tabIndex={0} onPointerDown={startProductSwipe} onPointerUp={finishProductSwipe} onPointerCancel={() => { swipeStart.current = null; }} onKeyDown={(event) => { if (event.key === "ArrowLeft") showProduct(productIndex - 1); if (event.key === "ArrowRight") showProduct(productIndex + 1); }}><div className="visual-ring" aria-hidden="true" /><div className="energy-sweep" aria-hidden="true" /><img key={products[productIndex].image} src={products[productIndex].image} alt={products[productIndex].title} draggable={false} /><span className="spec-chip chip-one">Engineered duty</span><span className="spec-chip chip-two">Integrated control</span><span className="swipe-hint"><ArrowLeft size={14} /> Swipe or drag <ArrowRight size={14} /></span></div><div className="equipment-rail">{products.map((product, index) => <button key={product.title} onClick={() => showProduct(index)} className={index === productIndex ? "active" : ""}><img src={product.image} alt="" /><span>{product.title}</span></button>)}</div></section>
 
     <section className="approach section-pad" id="approach" data-reveal><div className="approach-photo" aria-hidden="true" /><div className="approach-intro"><p className="eyebrow light">Integrated approach</p><h2>From requirement<br />to working solution.</h2><p>A clear, accountable path connecting technical decisions, equipment and long-term performance.</p></div><div className="process">{process.map(([number, title, copy], index) => <article key={number}><div className="process-number"><span>{number}</span><i>{index < process.length - 1 ? "→" : "✓"}</i></div><h3>{title}</h3><p>{copy}</p></article>)}</div></section>
 
