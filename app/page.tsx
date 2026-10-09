@@ -1,7 +1,17 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, ChevronRight, CircuitBoard, Droplets, Gauge, Mail, Menu, Phone, Settings2, ShieldCheck, Sparkles, Waves, X, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronRight, CircuitBoard, Droplets, Gauge, Mail, Menu, Phone, Send, Settings2, ShieldCheck, Sparkles, Waves, X, Zap } from "lucide-react";
+
+const heroScenes = [
+  "/gjvn-water-pump-hero.png",
+  "/products/mobile-flood-pump.jpg",
+  "/products/booster-system.jpg",
+];
+
+function WhatsAppIcon({ size = 24 }: { size?: number }) {
+  return <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6a10.6 10.6 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.7 8.7 0 0 1-2.6-1.6 9.7 9.7 0 0 1-1.8-2.2c-.2-.3 0-.5.1-.7l.5-.5.3-.6c.1-.2 0-.4 0-.6l-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.9 1.2 3.4 1.4 3.6c.2.2 2.5 3.8 6 5.3.8.4 1.5.6 2 .7.8.3 1.6.2 2.2.1.7-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.1-.3-.2-.6-.4Z" /></svg>;
+}
 
 const solutions = [
   { icon: Settings2, image: "/products/booster-system.jpg", number: "01", title: "Pump & Skid Systems", copy: "Integrated pump and skid-based engineering solutions configured around project, process and performance requirements.", tags: ["Booster packages", "Process skids", "Custom integration"] },
@@ -38,11 +48,24 @@ export default function Home() {
   const [productIndex, setProductIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [heroScene, setHeroScene] = useState(0);
+  const [whatsappOpen, setWhatsappOpen] = useState(false);
   const showProduct = (index: number) => setProductIndex((index + products.length) % products.length);
 
   useEffect(() => {
     const timer = window.setInterval(() => setProductIndex((index) => (index + 1) % products.length), 6000);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setHeroScene((index) => (index + 1) % heroScenes.length), 6500);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => event.key === "Escape" && setWhatsappOpen(false);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
   }, []);
 
   useEffect(() => {
@@ -68,6 +91,20 @@ export default function Home() {
     window.location.href = `mailto:sales@gjvnengineering.com?subject=${subject}&body=${body}`;
   };
 
+  const startWhatsApp = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const message = [
+      "Hello GJVN, I would like to discuss a water engineering requirement.",
+      `Name: ${form.get("wa-name")}`,
+      `Company: ${form.get("wa-company")}`,
+      `Email: ${form.get("wa-email")}`,
+      `Phone: ${form.get("wa-phone")}`,
+      `Requirement: ${form.get("wa-message")}`,
+    ].join("\n");
+    window.open(`https://wa.me/919876543210?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+  };
+
   return <main>
     <header className={`site-header${scrolled ? " scrolled" : ""}`}>
       <a href="#top" className="brand" aria-label="GJVN home"><span className="brand-logo"><img src="/gjvn-logo.png" alt="" /></span><span className="brand-copy"><strong>GJVN</strong><small>Water • Engineering • Digitalization</small></span></a>
@@ -76,7 +113,7 @@ export default function Home() {
       <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} aria-hidden="true" />
     </header>
 
-    <section className="hero" id="top"><div className="hero-photo" aria-hidden="true" /><div className="hero-orbit orbit-one" aria-hidden="true" /><div className="hero-orbit orbit-two" aria-hidden="true" /><div className="hero-grid" aria-hidden="true" /><div className="speed-lines" aria-hidden="true"><i /><i /><i /><i /></div>
+    <section className="hero" id="top"><div className="hero-wallpaper" aria-hidden="true">{heroScenes.map((scene, index) => <div key={scene} className={`hero-scene${index === heroScene ? " active" : ""}`} style={{ backgroundImage: `url(${scene})` }} />)}<div className="hero-shade" /><div className="water-current current-one" /><div className="water-current current-two" /></div><div className="hero-orbit orbit-one" aria-hidden="true" /><div className="hero-orbit orbit-two" aria-hidden="true" /><div className="hero-grid" aria-hidden="true" /><div className="speed-lines" aria-hidden="true"><i /><i /><i /><i /></div>
       <div className="hero-content"><div className="hero-kicker"><span><Sparkles size={14} /> Integrated water intelligence</span><i>01 / GJVN</i></div><h1>Engineering the<br /><em>flow of progress.</em></h1><p>Integrated pump systems, metering, treatment and digital solutions that turn complex water requirements into dependable infrastructure.</p><div className="hero-actions"><a className="button button-lime" href="#solutions">Explore solutions</a><a className="button button-glass" href="#contact">Discuss a project</a></div><div className="hero-trust"><span><ShieldCheck size={17} /> Application-led engineering</span><span><CircuitBoard size={17} /> Digital-ready systems</span><span><Zap size={17} /> Lifecycle support</span></div></div>
       <div className="hero-console" aria-hidden="true"><span>System status</span><strong>FLOW / OPTIMAL</strong><div><i /><i /><i /><i /><i /></div></div><a className="scroll-pill" href="#about">Discover GJVN <ChevronRight size={16} /></a>
     </section>
@@ -98,5 +135,14 @@ export default function Home() {
     </section>
 
     <footer><div className="footer-brand"><span className="brand-logo"><img src="/gjvn-logo.png" alt="GJVN" /></span><p>Integrated water, engineering and digitalization solutions.</p></div><div><strong>Solutions</strong><a href="#solutions">Pump & Skid Systems</a><a href="#solutions">Water Meter & IoT</a><a href="#solutions">Water & Wastewater</a><a href="#solutions">Desalination & ZLD</a></div><div><strong>Connect</strong><a href="mailto:info@gjvnengineering.com">info@gjvnengineering.com</a><a href="tel:+919876543210">+91 98765 43210</a><span>Baner Road, Pune</span></div><p className="copyright">© {new Date().getFullYear()} GJVN Engineering Solutions Pvt. Ltd. All rights reserved. Demo contact details shown for website visualization.</p></footer>
+
+    <aside className={`whatsapp-widget${whatsappOpen ? " open" : ""}`} aria-live="polite">
+      {whatsappOpen && <div className="whatsapp-card" role="dialog" aria-modal="false" aria-labelledby="whatsapp-title">
+        <div className="whatsapp-head"><span className="whatsapp-mark"><WhatsAppIcon /></span><div><strong id="whatsapp-title">Hi there <span aria-hidden="true">👋</span></strong><small>How can we help with your water project?</small></div><button type="button" onClick={() => setWhatsappOpen(false)} aria-label="Close WhatsApp enquiry"><X /></button></div>
+        <div className="whatsapp-agent"><span className="agent-avatar">G</span><div><strong>GJVN Project Desk</strong><small><i /> Online</small></div><span>WhatsApp</span></div>
+        <form className="whatsapp-form" onSubmit={startWhatsApp}><p>Start a WhatsApp conversation</p><input required name="wa-name" aria-label="Name" placeholder="Name *" /><input required type="email" name="wa-email" aria-label="Email" placeholder="Email *" /><input required name="wa-company" aria-label="Company" placeholder="Company *" /><div className="whatsapp-phone"><span>+91</span><input required inputMode="tel" name="wa-phone" aria-label="WhatsApp number" placeholder="WhatsApp number *" /></div><textarea required name="wa-message" aria-label="Message" placeholder="Tell us about the pump, flow, head or project *" /><button type="submit"><span>Start WhatsApp</span><WhatsAppIcon size={20} /></button><small>Your details are only placed in the message you choose to send.</small></form>
+      </div>}
+      <button className="whatsapp-launcher" type="button" onClick={() => setWhatsappOpen((open) => !open)} aria-expanded={whatsappOpen} aria-label={whatsappOpen ? "Close WhatsApp enquiry" : "Chat with GJVN on WhatsApp"}>{whatsappOpen ? <X /> : <WhatsAppIcon size={30} />}<span>Talk to an engineer</span></button>
+    </aside>
   </main>;
 }
