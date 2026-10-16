@@ -77,7 +77,7 @@ export default function Home() {
 
   const startWhatsAppDrag = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const widget = whatsappWidget.current;
-    if (!widget || (event.pointerType === "mouse" && event.button !== 0)) return;
+    if (whatsappOpen || !widget || (event.pointerType === "mouse" && event.button !== 0)) return;
     const bounds = widget.getBoundingClientRect();
     whatsappDrag.current = { offsetX: event.clientX - bounds.left, offsetY: event.clientY - bounds.top, moved: false };
     setWhatsappPosition({ x: bounds.left, y: bounds.top });
@@ -88,7 +88,7 @@ export default function Home() {
   const moveWhatsApp = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const drag = whatsappDrag.current;
     const widget = whatsappWidget.current;
-    if (!drag || !widget) return;
+    if (whatsappOpen || !drag || !widget) return;
     const bounds = widget.getBoundingClientRect();
     const x = Math.min(Math.max(8, event.clientX - drag.offsetX), window.innerWidth - bounds.width - 8);
     const y = Math.min(Math.max(8, event.clientY - drag.offsetY), window.innerHeight - bounds.height - 8);
