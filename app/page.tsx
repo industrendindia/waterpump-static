@@ -52,6 +52,7 @@ export default function Home() {
   const [whatsappOpen, setWhatsappOpen] = useState(false);
   const [whatsappPosition, setWhatsappPosition] = useState<{ x: number; y: number } | null>(null);
   const [whatsappDragging, setWhatsappDragging] = useState(false);
+  const [enquiryStatus, setEnquiryStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
   const whatsappWidget = useRef<HTMLElement | null>(null);
   const whatsappDrag = useRef<{ offsetX: number; offsetY: number; moved: boolean } | null>(null);
@@ -149,12 +150,23 @@ export default function Home() {
     return () => { window.removeEventListener("scroll", updateScroll); observer.disconnect(); };
   }, []);
 
-  const sendEnquiry = (event: FormEvent<HTMLFormElement>) => {
+  const sendEnquiry = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const subject = encodeURIComponent(`Project enquiry — ${form.get("company") || form.get("name")}`);
-    const body = encodeURIComponent(`Name: ${form.get("name")}\nCompany: ${form.get("company")}\nEmail: ${form.get("email")}\nPhone: ${form.get("phone")}\n\nRequirement:\n${form.get("requirement")}`);
-    window.location.href = `mailto:mail@gjvn.co.in?subject=${subject}&body=${body}`;
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    setEnquiryStatus("sending");
+    try {
+      const response = await fetch("/api/enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(form.entries())),
+      });
+      if (!response.ok) throw new Error("Unable to send enquiry");
+      formElement.reset();
+      setEnquiryStatus("sent");
+    } catch {
+      setEnquiryStatus("error");
+    }
   };
 
   const startWhatsApp = (event: FormEvent<HTMLFormElement>) => {
@@ -197,7 +209,7 @@ export default function Home() {
     <section className="services section-pad" id="services" data-reveal><div className="services-title"><p className="eyebrow">Beyond equipment</p><h2>Support that keeps<br /><em>projects moving.</em></h2><p>Practical capability from specification through modernization.</p></div><div className="service-list">{services.map(([number, title, copy, image]) => <a href="#contact" className="service-row" key={number}><span>{number}</span><img src={image} alt="" /><h3>{title}</h3><p>{copy}</p><ChevronRight /></a>)}</div></section>
 
     <section className="contact section-pad" id="contact" data-reveal><div className="contact-copy"><p className="eyebrow light">Contact GJVN</p><h2>Let’s engineer<br /><em>what flows next.</em></h2><p>Share your application, flow, head, water quality or project stage. Our team will help shape the next technical step.</p><div className="contact-details"><a href="tel:+919876543210"><Phone /><span><small>Mobile</small>+91 98765 43210</span></a><a href="mailto:mail@gjvn.co.in"><Mail /><span><small>Email</small>mail@gjvn.co.in</span></a></div><address>Office No. 402, Business Avenue,<br />Baner Road, Pune, Maharashtra 411045, India</address></div>
-      <form className="enquiry" onSubmit={sendEnquiry}><div className="form-head"><span>Project enquiry</span><strong>Tell us what you need.</strong></div><label>Name<input required name="name" placeholder="Your name" /></label><label>Company<input name="company" placeholder="Company name" /></label><label>Email<input required type="email" name="email" placeholder="name@company.com" /></label><label>Phone<input name="phone" placeholder="Contact number" /></label><label className="full">Requirement<textarea required name="requirement" placeholder="Application, flow, head, water quality, timeline..." /></label><button className="button button-lime" type="submit">Prepare email enquiry</button><small>This opens your email app with the project details prepared.</small></form>
+      <form className="enquiry" onSubmit={sendEnquiry}><div className="form-head"><span>Project enquiry</span><strong>Tell us what you need.</strong></div><label>Name<input required name="name" maxLength={100} placeholder="Your name" /></label><label>Company<input name="company" maxLength={120} placeholder="Company name" /></label><label>Email<input required type="email" name="email" maxLength={160} placeholder="name@company.com" /></label><label>Phone<input name="phone" maxLength={40} placeholder="Contact number" /></label><label className="full">Requirement<textarea required name="requirement" maxLength={3000} placeholder="Application, flow, head, water quality, timeline..." /></label><button className="button button-lime" type="submit" disabled={enquiryStatus === "sending"}>{enquiryStatus === "sending" ? "Sending…" : "Send email enquiry"}</button><small className={`enquiry-status ${enquiryStatus}`} role="status" aria-live="polite">{enquiryStatus === "sent" ? "Thank you. Your enquiry has been sent to GJVN." : enquiryStatus === "error" ? "The enquiry could not be sent. Please email mail@gjvn.co.in directly." : "Your enquiry will be delivered securely to the GJVN team."}</small></form>
     </section>
 
     <footer><div className="footer-brand"><span className="brand-logo"><img src="/gjvn-logo.png" alt="GJVN" /></span><p>Integrated water, engineering and digitalization solutions.</p></div><div><strong>Solutions</strong><a href="#solutions">Pump & Skid Systems</a><a href="#solutions">Water Meter & IoT</a><a href="#solutions">Water & Wastewater</a><a href="#solutions">Desalination & ZLD</a></div><div><strong>Connect</strong><a href="mailto:mail@gjvn.co.in">mail@gjvn.co.in</a><a href="tel:+919876543210">+91 98765 43210</a><span>Baner Road, Pune</span></div><p className="copyright">© {new Date().getFullYear()} GJVN Engineering Solutions Pvt. Ltd. All rights reserved.</p></footer>

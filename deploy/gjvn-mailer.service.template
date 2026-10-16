@@ -1,0 +1,22 @@
+[Unit]
+Description=GJVN website enquiry mailer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=waterpump
+Group=waterpump
+WorkingDirectory=/srv/waterpump-static/app
+EnvironmentFile=/etc/gjvn-mailer.env
+ExecStart=/opt/node-v24.18.0-linux-x64/bin/node /srv/waterpump-static/app/deploy/gjvn-mailer.mjs
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/srv/waterpump-static/app
+
+[Install]
+WantedBy=multi-user.target
