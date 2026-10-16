@@ -78,3 +78,8 @@ body{background:#f7fbfc;color:#08243b}.site-header{color:#08243b;background:rgba
 .whatsapp-launcher{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .whatsapp-widget.dragging .whatsapp-launcher{cursor:grabbing;transform:scale(1.04);box-shadow:0 22px 55px rgba(4,77,42,.46),0 0 0 7px rgba(37,211,102,.14)}
 .enquiry>button:disabled{cursor:wait;filter:saturate(.7);opacity:.78}.enquiry-status.sent{color:#238312;font-weight:800}.enquiry-status.error{color:#b42318;font-weight:800}
+
+/* Stronger header branding */
+@media(min-width:901px){.site-header .brand-logo{width:72px;height:72px;border-radius:20px}.site-header .brand-copy strong{font-size:2rem}.site-header .brand-copy small{font-size:.77rem}}
+@media(max-width:900px){.site-header .brand-logo{width:52px;height:52px;border-radius:15px}.site-header .brand-copy strong{font-size:1.3rem}.site-header .brand-copy small{font-size:.58rem}}
+@media(max-width:390px){.site-header .brand-logo{width:50px;height:50px}.site-header .brand-copy strong{font-size:1.25rem}.site-header .brand-copy small{font-size:.52rem;max-width:176px}}
