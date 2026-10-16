@@ -63,7 +63,7 @@ function smtpSend({ name, company, email, phone, requirement }) {
         await command(`RCPT TO:<${recipient}>`, [250, 251]);
         await command("DATA", [354]);
 
-        const subject = header(`Website enquiry — ${company || name}`, 180);
+        const subject = header(`Website enquiry - ${company || name}`, 180);
         const plain = `New website enquiry\n\nName: ${name}\nCompany: ${company || "—"}\nEmail: ${email}\nPhone: ${phone || "—"}\n\nRequirement:\n${requirement}`;
         const html = `<h2>New website enquiry</h2><p><strong>Name:</strong> ${escapeHtml(name)}<br><strong>Company:</strong> ${escapeHtml(company || "—")}<br><strong>Email:</strong> ${escapeHtml(email)}<br><strong>Phone:</strong> ${escapeHtml(phone || "—")}</p><h3>Requirement</h3><p>${escapeHtml(requirement).replace(/\n/g, "<br>")}</p>`;
         const boundary = `gjvn-${Date.now()}`;
