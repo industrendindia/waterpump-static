@@ -83,3 +83,7 @@ body{background:#f7fbfc;color:#08243b}.site-header{color:#08243b;background:rgba
 @media(min-width:901px){.site-header .brand-logo{width:72px;height:72px;border-radius:20px}.site-header .brand-copy strong{font-size:2rem}.site-header .brand-copy small{font-size:.77rem}}
 @media(max-width:900px){.site-header .brand-logo{width:52px;height:52px;border-radius:15px}.site-header .brand-copy strong{font-size:1.3rem}.site-header .brand-copy small{font-size:.58rem}}
 @media(max-width:390px){.site-header .brand-logo{width:50px;height:50px}.site-header .brand-copy strong{font-size:1.25rem}.site-header .brand-copy small{font-size:.52rem;max-width:176px}}
+
+/* Keep a dragged WhatsApp launcher anchored while its panel opens */
+.whatsapp-widget.positioned .whatsapp-launcher{width:64px;padding:0;justify-content:center}.whatsapp-widget.positioned .whatsapp-launcher>span{display:none}.whatsapp-widget .whatsapp-card{position:absolute;right:0;bottom:calc(100% + 14px)}.whatsapp-widget.above-left .whatsapp-card{left:0;right:auto}.whatsapp-widget.below-right .whatsapp-card{top:calc(100% + 14px);bottom:auto}.whatsapp-widget.below-left .whatsapp-card{top:calc(100% + 14px);bottom:auto;left:0;right:auto}
+@media(max-width:760px){.whatsapp-widget.positioned .whatsapp-launcher{width:58px}.whatsapp-widget .whatsapp-card,.whatsapp-widget.above-left .whatsapp-card,.whatsapp-widget.below-right .whatsapp-card,.whatsapp-widget.below-left .whatsapp-card{position:fixed;left:14px;right:14px;top:auto;bottom:84px;width:auto;max-height:calc(100svh - 100px)}}

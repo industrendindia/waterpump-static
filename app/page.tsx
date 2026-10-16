@@ -52,6 +52,7 @@ export default function Home() {
   const [whatsappOpen, setWhatsappOpen] = useState(false);
   const [whatsappPosition, setWhatsappPosition] = useState<{ x: number; y: number } | null>(null);
   const [whatsappDragging, setWhatsappDragging] = useState(false);
+  const [whatsappPanelPlacement, setWhatsappPanelPlacement] = useState<"above-right" | "above-left" | "below-right" | "below-left">("above-right");
   const [enquiryStatus, setEnquiryStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
   const whatsappWidget = useRef<HTMLElement | null>(null);
@@ -102,10 +103,13 @@ export default function Home() {
 
   const toggleWhatsApp = () => {
     if (whatsappDrag.current?.moved) return;
-    setWhatsappOpen((open) => {
-      if (!open) setWhatsappPosition(null);
-      return !open;
-    });
+    if (!whatsappOpen && whatsappWidget.current) {
+      const bounds = whatsappWidget.current.getBoundingClientRect();
+      const vertical = bounds.top < window.innerHeight / 2 ? "below" : "above";
+      const horizontal = bounds.left < window.innerWidth / 2 ? "left" : "right";
+      setWhatsappPanelPlacement(`${vertical}-${horizontal}` as typeof whatsappPanelPlacement);
+    }
+    setWhatsappOpen((open) => !open);
   };
 
   useEffect(() => {
@@ -214,7 +218,7 @@ export default function Home() {
 
     <footer><div className="footer-brand"><span className="brand-logo"><img src="/gjvn-logo.png" alt="GJVN" /></span><p>Integrated water, engineering and digitalization solutions.</p></div><div><strong>Solutions</strong><a href="#solutions">Pump & Skid Systems</a><a href="#solutions">Water Meter & IoT</a><a href="#solutions">Water & Wastewater</a><a href="#solutions">Desalination & ZLD</a></div><div><strong>Connect</strong><a href="mailto:mail@gjvn.co.in">mail@gjvn.co.in</a><a href="tel:+919876543210">+91 98765 43210</a><span>Baner Road, Pune</span></div><p className="copyright">© {new Date().getFullYear()} GJVN Engineering Solutions Pvt. Ltd. All rights reserved.</p></footer>
 
-    <aside ref={whatsappWidget} className={`whatsapp-widget${whatsappOpen ? " open" : ""}${whatsappDragging ? " dragging" : ""}`} style={whatsappPosition ? { left: whatsappPosition.x, top: whatsappPosition.y, right: "auto", bottom: "auto" } : undefined} aria-live="polite">
+    <aside ref={whatsappWidget} className={`whatsapp-widget ${whatsappPanelPlacement}${whatsappOpen ? " open" : ""}${whatsappDragging ? " dragging" : ""}${whatsappPosition ? " positioned" : ""}`} style={whatsappPosition ? { left: whatsappPosition.x, top: whatsappPosition.y, right: "auto", bottom: "auto" } : undefined} aria-live="polite">
       {whatsappOpen && <div className="whatsapp-card" role="dialog" aria-modal="false" aria-labelledby="whatsapp-title">
         <div className="whatsapp-head"><span className="whatsapp-mark"><WhatsAppIcon /></span><div><strong id="whatsapp-title">Hi there <span aria-hidden="true">👋</span></strong><small>How can we help with your water project?</small></div><button type="button" onClick={() => setWhatsappOpen(false)} aria-label="Close WhatsApp enquiry"><X /></button></div>
         <div className="whatsapp-agent"><span className="agent-avatar">G</span><div><strong>GJVN Project Desk</strong><small><i /> Online</small></div><span>WhatsApp</span></div>
