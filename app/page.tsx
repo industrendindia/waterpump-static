@@ -42,10 +42,8 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [heroScene, setHeroScene] = useState(0);
-  const [whatsappOpen, setWhatsappOpen] = useState(false);
   const [whatsappPosition, setWhatsappPosition] = useState<{ x: number; y: number } | null>(null);
   const [whatsappDragging, setWhatsappDragging] = useState(false);
-  const [whatsappPanelPlacement, setWhatsappPanelPlacement] = useState<"above-right" | "above-left" | "below-right" | "below-left">("above-right");
   const [enquiryStatus, setEnquiryStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
@@ -71,7 +69,7 @@ export default function Home() {
 
   const startWhatsAppDrag = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const widget = whatsappWidget.current;
-    if (whatsappOpen || !widget || (event.pointerType === "mouse" && event.button !== 0)) return;
+    if (!widget || (event.pointerType === "mouse" && event.button !== 0)) return;
     const bounds = widget.getBoundingClientRect();
     whatsappDrag.current = { offsetX: event.clientX - bounds.left, offsetY: event.clientY - bounds.top, moved: false };
     setWhatsappPosition({ x: bounds.left, y: bounds.top });
@@ -82,7 +80,7 @@ export default function Home() {
   const moveWhatsApp = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const drag = whatsappDrag.current;
     const widget = whatsappWidget.current;
-    if (whatsappOpen || !drag || !widget) return;
+    if (!drag || !widget) return;
     const bounds = widget.getBoundingClientRect();
     const x = Math.min(Math.max(8, event.clientX - drag.offsetX), window.innerWidth - bounds.width - 8);
     const y = Math.min(Math.max(8, event.clientY - drag.offsetY), window.innerHeight - bounds.height - 8);
@@ -97,13 +95,7 @@ export default function Home() {
 
   const toggleWhatsApp = () => {
     if (whatsappDrag.current?.moved) return;
-    if (!whatsappOpen && whatsappWidget.current) {
-      const bounds = whatsappWidget.current.getBoundingClientRect();
-      const vertical = bounds.top < window.innerHeight / 2 ? "below" : "above";
-      const horizontal = bounds.left < window.innerWidth / 2 ? "left" : "right";
-      setWhatsappPanelPlacement(`${vertical}-${horizontal}` as typeof whatsappPanelPlacement);
-    }
-    setWhatsappOpen((open) => !open);
+    window.open("https://wa.me/919876543210", "_blank", "noopener,noreferrer");
   };
 
   useEffect(() => {
@@ -128,12 +120,6 @@ export default function Home() {
         if (!alreadyCounted) window.localStorage.setItem("gjvn-visitor-counted", "1");
       })
       .catch(() => setVisitorCount(null));
-  }, []);
-
-  useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => event.key === "Escape" && setWhatsappOpen(false);
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
   }, []);
 
   useEffect(() => {
@@ -181,20 +167,6 @@ export default function Home() {
     }
   };
 
-  const startWhatsApp = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const message = [
-      "Hello GJVN, I would like to discuss a water engineering requirement.",
-      `Name: ${form.get("wa-name")}`,
-      `Company: ${form.get("wa-company")}`,
-      `Email: ${form.get("wa-email")}`,
-      `Phone: ${form.get("wa-phone")}`,
-      `Requirement: ${form.get("wa-message")}`,
-    ].join("\n");
-    window.open(`https://wa.me/919876543210?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
-  };
-
   return <main>
     <header className={`site-header${scrolled ? " scrolled" : ""}`}>
       <a href="#top" className="brand" aria-label="GJVN home"><span className="brand-logo"><img src="/gjvn-logo.png" alt="" /></span><span className="brand-copy"><strong>GJVN</strong><small>Water • Engineering • Digitalization</small></span></a>
@@ -223,13 +195,8 @@ export default function Home() {
 
     <footer><div className="footer-brand"><span className="brand-logo"><img src="/gjvn-logo.png" alt="GJVN" /></span><p>Integrated water, engineering and digitalization solutions.</p></div><div><strong>Solutions</strong><a href="#solutions">Pump & Skid Systems</a><a href="#solutions">Water Meter & IoT</a><a href="#solutions">Water & Wastewater</a><a href="#solutions">Desalination & ZLD</a></div><div><strong>Connect</strong><a href="mailto:mail@gjvn.co.in">mail@gjvn.co.in</a><a href="tel:+919876543210">+91 98765 43210</a><span>Baner Road, Pune</span></div><p className="copyright">© {new Date().getFullYear()} GJVN Engineering Solutions Pvt. Ltd. All rights reserved.</p></footer>
 
-    <aside ref={whatsappWidget} className={`whatsapp-widget ${whatsappPanelPlacement}${whatsappOpen ? " open" : ""}${whatsappDragging ? " dragging" : ""}${whatsappPosition ? " positioned" : ""}`} style={whatsappPosition ? { left: whatsappPosition.x, top: whatsappPosition.y, right: "auto", bottom: "auto" } : undefined} aria-live="polite">
-      {whatsappOpen && <div className="whatsapp-card" role="dialog" aria-modal="false" aria-labelledby="whatsapp-title">
-        <div className="whatsapp-head"><span className="whatsapp-mark"><WhatsAppIcon /></span><div><strong id="whatsapp-title">Hi there <span aria-hidden="true">👋</span></strong><small>How can we help with your water project?</small></div><button type="button" onClick={() => setWhatsappOpen(false)} aria-label="Close WhatsApp enquiry"><X /></button></div>
-        <div className="whatsapp-agent"><span className="agent-avatar">G</span><div><strong>GJVN Project Desk</strong><small><i /> Online</small></div><span>WhatsApp</span></div>
-        <form className="whatsapp-form" onSubmit={startWhatsApp}><p>Start a WhatsApp conversation</p><input required name="wa-name" aria-label="Name" placeholder="Name *" /><input required type="email" name="wa-email" aria-label="Email" placeholder="Email *" /><input required name="wa-company" aria-label="Company" placeholder="Company *" /><div className="whatsapp-phone"><span>+91</span><input required inputMode="tel" name="wa-phone" aria-label="WhatsApp number" placeholder="WhatsApp number *" /></div><textarea required name="wa-message" aria-label="Message" placeholder="Tell us about the pump, flow, head or project *" /><button type="submit"><span>Start WhatsApp</span><WhatsAppIcon size={20} /></button><small>Your details are only placed in the message you choose to send.</small></form>
-      </div>}
-      <button className="whatsapp-launcher" type="button" onPointerDown={startWhatsAppDrag} onPointerMove={moveWhatsApp} onPointerUp={finishWhatsAppDrag} onPointerCancel={finishWhatsAppDrag} onClick={toggleWhatsApp} aria-expanded={whatsappOpen} aria-label={whatsappOpen ? "Close WhatsApp enquiry" : "Chat with GJVN on WhatsApp"}>{whatsappOpen ? <X /> : <WhatsAppIcon size={30} />}<span>Talk to an engineer</span></button>
+    <aside ref={whatsappWidget} className={`whatsapp-widget${whatsappDragging ? " dragging" : ""}${whatsappPosition ? " positioned" : ""}`} style={whatsappPosition ? { left: whatsappPosition.x, top: whatsappPosition.y, right: "auto", bottom: "auto" } : undefined} aria-live="polite">
+      <button className="whatsapp-launcher" type="button" onPointerDown={startWhatsAppDrag} onPointerMove={moveWhatsApp} onPointerUp={finishWhatsAppDrag} onPointerCancel={finishWhatsAppDrag} onClick={toggleWhatsApp} aria-label="Chat with GJVN on WhatsApp"><WhatsAppIcon size={30} /><span>Talk to an engineer</span></button>
     </aside>
   </main>;
 }
