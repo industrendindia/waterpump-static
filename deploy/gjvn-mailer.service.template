@@ -17,6 +17,7 @@ PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
 ReadOnlyPaths=/srv/waterpump-static/app
+ReadWritePaths=/srv/waterpump-static/runtime
 
 [Install]
 WantedBy=multi-user.target

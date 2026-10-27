@@ -1,5 +1,8 @@
 import http from "node:http";
 import tls from "node:tls";
+import { createHmac } from "node:crypto";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 
 const host = process.env.MAILER_HOST || "127.0.0.1";
 const port = Number(process.env.MAILER_PORT || 8792);
@@ -9,6 +12,9 @@ const smtpUser = process.env.SMTP_USER || "mail@gjvn.co.in";
 const smtpPassword = process.env.SMTP_PASSWORD;
 const recipient = process.env.MAIL_TO || "mail@gjvn.co.in";
 const allowedOrigin = process.env.ALLOWED_ORIGIN || "https://gjvn.co.in";
+const visitorDataFile = process.env.VISITOR_DATA_FILE || "/srv/waterpump-static/runtime/visitor-count.json";
+const visitorCountBase = Number(process.env.VISITOR_COUNT_BASE || 0);
+const visitorSalt = process.env.VISITOR_SALT || smtpPassword;
 
 if (!smtpPassword) throw new Error("SMTP_PASSWORD is required");
 
@@ -19,6 +25,45 @@ const sendJson = (response, status, body) => {
   response.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
   response.end(JSON.stringify(body));
 };
+
+let visitorUpdate = Promise.resolve();
+async function readVisitorState() {
+  try {
+    const stored = JSON.parse(await readFile(visitorDataFile, "utf8"));
+    return { count: Number(stored.count) || visitorCountBase, seen: stored.seen && typeof stored.seen === "object" ? stored.seen : {} };
+  } catch (error) {
+    if (error?.code !== "ENOENT") console.error(new Date().toISOString(), "Visitor counter read failed");
+    return { count: visitorCountBase, seen: {} };
+  }
+}
+
+async function visitorCount(request, increment) {
+  if (!increment) {
+    await visitorUpdate;
+    return (await readVisitorState()).count;
+  }
+  const forwarded = String(request.headers["x-forwarded-for"] || request.socket.remoteAddress || "unknown").split(",")[0].trim();
+  const userAgent = String(request.headers["user-agent"] || "unknown").slice(0, 300);
+  const identity = createHmac("sha256", visitorSalt).update(`${forwarded}|${userAgent}`).digest("hex");
+  let result = visitorCountBase;
+  visitorUpdate = visitorUpdate.then(async () => {
+    const state = await readVisitorState();
+    const now = Date.now();
+    const oldest = now - 400 * 24 * 60 * 60 * 1000;
+    state.seen = Object.fromEntries(Object.entries(state.seen).filter(([, time]) => Number(time) > oldest));
+    if (!state.seen[identity]) {
+      state.seen[identity] = now;
+      state.count += 1;
+    }
+    await mkdir(dirname(visitorDataFile), { recursive: true });
+    const temporary = `${visitorDataFile}.tmp`;
+    await writeFile(temporary, `${JSON.stringify(state)}\n`, { mode: 0o600 });
+    await rename(temporary, visitorDataFile);
+    result = state.count;
+  });
+  await visitorUpdate;
+  return result;
+}
 
 function smtpSend({ name, company, email, phone, requirement }) {
   return new Promise((resolve, reject) => {
@@ -105,6 +150,13 @@ function smtpSend({ name, company, email, phone, requirement }) {
 const attempts = new Map();
 const server = http.createServer((request, response) => {
   if (request.method === "GET" && request.url === "/health") return sendJson(response, 200, { ok: true });
+  if (["GET", "POST"].includes(request.method) && request.url === "/api/visitor-count") {
+    if (request.method === "POST" && request.headers.origin && ![allowedOrigin, "https://www.gjvn.co.in"].includes(request.headers.origin)) return sendJson(response, 403, { ok: false });
+    visitorCount(request, request.method === "POST")
+      .then((count) => sendJson(response, 200, { count }))
+      .catch(() => sendJson(response, 500, { ok: false }));
+    return;
+  }
   if (request.method !== "POST" || request.url !== "/api/enquiry") return sendJson(response, 404, { ok: false });
   if (request.headers.origin && ![allowedOrigin, "https://www.gjvn.co.in"].includes(request.headers.origin)) return sendJson(response, 403, { ok: false });
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, ChevronRight, CircuitBoard, Droplets, Gauge, Mail, Menu, Phone, Send, Settings2, ShieldCheck, Sparkles, Waves, X, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronRight, CircuitBoard, Droplets, Eye, Gauge, Mail, Menu, Phone, Send, Settings2, ShieldCheck, Sparkles, Waves, X, Zap } from "lucide-react";
 
 const heroScenes = [
   "/gjvn-water-pump-hero.png",
@@ -29,13 +29,6 @@ const products = [
   { image: "/products/self-priming-pumps.jpg", title: "Self-priming pumps", category: "Drainage & wastewater", copy: "Rugged pump sets designed for fast priming and dependable handling of demanding water duties." },
 ];
 
-const process = [
-  ["01", "Understand", "Application, site and performance requirements."],
-  ["02", "Engineer & customize", "The right equipment and solution architecture."],
-  ["03", "Source & integrate", "Suitable components brought into one project solution."],
-  ["04", "Support & upgrade", "Parts, retrofits and modernization for longer asset value."],
-];
-
 const services = [
   ["01", "Sourcing & supply", "Coordinated access to fit-for-purpose water equipment.", "/products/centrifugal-pump.jpg"],
   ["02", "Customized solutions", "Packages designed around application and site needs.", "/products/booster-system.jpg"],
@@ -54,6 +47,7 @@ export default function Home() {
   const [whatsappDragging, setWhatsappDragging] = useState(false);
   const [whatsappPanelPlacement, setWhatsappPanelPlacement] = useState<"above-right" | "above-left" | "below-right" | "below-left">("above-right");
   const [enquiryStatus, setEnquiryStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [visitorCount, setVisitorCount] = useState<number | null>(null);
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
   const whatsappWidget = useRef<HTMLElement | null>(null);
   const whatsappDrag = useRef<{ offsetX: number; offsetY: number; moved: boolean } | null>(null);
@@ -120,6 +114,20 @@ export default function Home() {
   useEffect(() => {
     const timer = window.setInterval(() => setHeroScene((index) => (index + 1) % heroScenes.length), 6500);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const alreadyCounted = window.localStorage.getItem("gjvn-visitor-counted") === "1";
+    fetch("/api/visitor-count", { method: alreadyCounted ? "GET" : "POST" })
+      .then((response) => {
+        if (!response.ok) throw new Error("Visitor count unavailable");
+        return response.json() as Promise<{ count: number }>;
+      })
+      .then(({ count }) => {
+        setVisitorCount(count);
+        if (!alreadyCounted) window.localStorage.setItem("gjvn-visitor-counted", "1");
+      })
+      .catch(() => setVisitorCount(null));
   }, []);
 
   useEffect(() => {
@@ -190,13 +198,13 @@ export default function Home() {
   return <main>
     <header className={`site-header${scrolled ? " scrolled" : ""}`}>
       <a href="#top" className="brand" aria-label="GJVN home"><span className="brand-logo"><img src="/gjvn-logo.png" alt="" /></span><span className="brand-copy"><strong>GJVN</strong><small>Water • Engineering • Digitalization</small></span></a>
-      <nav className={menuOpen ? "nav open" : "nav"} aria-label="Main navigation"><a href="#about" onClick={() => setMenuOpen(false)}>About</a><a href="#solutions" onClick={() => setMenuOpen(false)}>Solutions</a><a href="#approach" onClick={() => setMenuOpen(false)}>Approach</a><a href="#services" onClick={() => setMenuOpen(false)}>Services</a><a className="nav-cta" href="#contact" onClick={() => setMenuOpen(false)}>Discuss a project</a></nav>
+      <nav className={menuOpen ? "nav open" : "nav"} aria-label="Main navigation"><a href="#about" onClick={() => setMenuOpen(false)}>About</a><a href="#solutions" onClick={() => setMenuOpen(false)}>Solutions</a><a href="#services" onClick={() => setMenuOpen(false)}>Services</a><a className="nav-cta" href="#contact" onClick={() => setMenuOpen(false)}>Discuss a project</a></nav>
       <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation">{menuOpen ? <X /> : <Menu />}</button>
       <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} aria-hidden="true" />
     </header>
 
     <section className="hero" id="top"><div className="hero-wallpaper" aria-hidden="true">{heroScenes.map((scene, index) => <div key={scene} className={`hero-scene${index === heroScene ? " active" : ""}`} style={{ backgroundImage: `url(${scene})` }} />)}<div className="hero-shade" /><div className="water-current current-one" /><div className="water-current current-two" /></div><div className="hero-orbit orbit-one" aria-hidden="true" /><div className="hero-orbit orbit-two" aria-hidden="true" /><div className="hero-grid" aria-hidden="true" /><div className="speed-lines" aria-hidden="true"><i /><i /><i /><i /></div>
-      <div className="hero-content"><div className="hero-kicker"><span><Sparkles size={14} /> Integrated water intelligence</span></div><h1>Engineering the<br /><em>flow of progress.</em></h1><p>Integrated pump systems, metering, treatment and digital solutions that turn complex water requirements into dependable infrastructure.</p><div className="hero-actions"><a className="button button-lime" href="#solutions">Explore solutions</a><a className="button button-glass" href="#contact">Discuss a project</a></div><div className="hero-trust"><span><ShieldCheck size={17} /> Application-led engineering</span><span><CircuitBoard size={17} /> Digital-ready systems</span><span><Zap size={17} /> Lifecycle support</span></div></div>
+      <div className="hero-content"><div className="hero-kicker"><span><Sparkles size={14} /> Integrated water intelligence</span></div><h1>GJVN’s Engineering<br /><em>Solutions</em></h1><p>As a full equipment and service supplier, GJVN provides pumps, valves, water and wastewater treatment solutions, hydropneumatic systems for buildings, water meters, smart water management transformation, operational guidance and digital solutions.</p><div className="hero-actions"><a className="button button-lime" href="#solutions">Explore solutions</a><a className="button button-glass" href="#contact">Discuss a project</a></div><div className="hero-trust"><span><ShieldCheck size={17} /> Application-led engineering</span><span><CircuitBoard size={17} /> Digital-ready systems</span><span><Zap size={17} /> Lifecycle support</span></div></div>
       <div className="hero-console" aria-hidden="true"><span>System status</span><strong>FLOW / OPTIMAL</strong><div><i /><i /><i /><i /><i /></div></div><div className="hero-slider-controls" aria-label="Pump project images"><button type="button" onClick={() => setHeroScene((heroScene - 1 + heroScenes.length) % heroScenes.length)} aria-label="Previous hero image"><ArrowLeft /></button><div>{heroScenes.map((scene, index) => <button type="button" key={scene} className={index === heroScene ? "active" : ""} onClick={() => setHeroScene(index)} aria-label={`Show hero image ${index + 1}`} />)}</div><button type="button" onClick={() => setHeroScene((heroScene + 1) % heroScenes.length)} aria-label="Next hero image"><ArrowRight /></button></div><a className="scroll-pill" href="#about">Discover GJVN <ChevronRight size={16} /></a>
     </section>
 
@@ -204,11 +212,9 @@ export default function Home() {
 
     <section className="about section-pad" id="about" data-reveal><div className="about-label"><span>About GJVN</span><strong>ENGINEERING<br />+ WATER<br />+ DIGITAL</strong><div className="about-pictures"><img src="/products/vertical-multistage-pump.jpg" alt="Vertical multistage water pump" /><img src="/products/mobile-flood-pump.jpg" alt="Mobile flood-control pumping unit" /></div></div><div className="about-main"><p className="eyebrow">One connected partner</p><h2>One partner across the <em>water engineering lifecycle.</em></h2><p className="lead">GJVN brings engineering, equipment, integration and modernization together—so project teams move from requirement to reliable operation with fewer hand-offs.</p><div className="about-stats"><div><strong>360°</strong><span>System perspective</span></div><div><strong>04</strong><span>Core solution areas</span></div><div><strong>01</strong><span>Coordinated partner</span></div></div></div></section>
 
-    <section className="solutions section-pad" id="solutions" data-reveal><div className="section-head"><div><p className="eyebrow light">Core solutions</p><h2>Built around your application.<br /><em>Not a catalogue.</em></h2></div><p>From equipment packages to intelligent water management, each solution starts with the duty, environment and outcome.</p></div><div className="solution-grid">{solutions.map((item) => { const Icon = item.icon; return <article className="solution-card" key={item.number}><div className="solution-image"><img src={item.image} alt="" /><span><Icon /> {item.number}</span></div><div className="solution-body"><h3>{item.title}</h3><p>{item.copy}</p><ul>{item.tags.map((tag) => <li key={tag}><Check size={14} />{tag}</li>)}</ul><a href="#contact">Shape this solution <ChevronRight size={16} /></a></div></article>; })}</div></section>
+    <section className="solutions section-pad" id="solutions" data-reveal><div className="section-head"><div><p className="eyebrow light">Core solutions</p><h2>Built around<br /><em>your application.</em></h2></div><p>From equipment packages to intelligent water management, each solution starts with the duty, environment and outcome.</p></div><div className="solution-grid">{solutions.map((item) => { const Icon = item.icon; return <article className="solution-card" key={item.number}><div className="solution-image"><img src={item.image} alt="" /><span><Icon /> {item.number}</span></div><div className="solution-body"><h3>{item.title}</h3><p>{item.copy}</p><ul>{item.tags.map((tag) => <li key={tag}><Check size={14} />{tag}</li>)}</ul><a href="#contact">Shape this solution <ChevronRight size={16} /></a></div></article>; })}</div></section>
 
     <section className="equipment section-pad" aria-labelledby="equipment-title" data-reveal><div className="equipment-copy"><p className="eyebrow">Equipment intelligence</p><h2 id="equipment-title">Real equipment.<br /><em>Precisely applied.</em></h2><p>{products[productIndex].copy}</p><div className="equipment-meta"><span>{products[productIndex].category}</span><strong>{products[productIndex].title}</strong></div><div className="equipment-controls"><button onClick={() => showProduct(productIndex - 1)} aria-label="Previous product"><ArrowLeft /></button><span>{String(productIndex + 1).padStart(2, "0")} / {String(products.length).padStart(2, "0")}</span><button onClick={() => showProduct(productIndex + 1)} aria-label="Next product"><ArrowRight /></button></div></div><div className="equipment-visual" role="region" aria-label={`${products[productIndex].title}. Swipe or drag left and right to browse products.`} tabIndex={0} onPointerDown={startProductSwipe} onPointerUp={finishProductSwipe} onPointerCancel={() => { swipeStart.current = null; }} onKeyDown={(event) => { if (event.key === "ArrowLeft") showProduct(productIndex - 1); if (event.key === "ArrowRight") showProduct(productIndex + 1); }}><div className="visual-ring" aria-hidden="true" /><div className="energy-sweep" aria-hidden="true" /><div className="equipment-product-frame"><img key={products[productIndex].image} src={products[productIndex].image} alt={products[productIndex].title} draggable={false} /></div><span className="spec-chip chip-one">Engineered duty</span><span className="spec-chip chip-two">Integrated control</span><span className="swipe-hint"><ArrowLeft size={14} /> Swipe or drag <ArrowRight size={14} /></span></div><div className="equipment-rail">{products.map((product, index) => <button key={product.title} onClick={() => showProduct(index)} className={index === productIndex ? "active" : ""}><img src={product.image} alt="" /><span>{product.title}</span></button>)}</div></section>
-
-    <section className="approach section-pad" id="approach" data-reveal><div className="approach-photo" aria-hidden="true" /><div className="approach-intro"><p className="eyebrow light">Integrated approach</p><h2>From requirement<br />to working solution.</h2><p>A clear, accountable path connecting technical decisions, equipment and long-term performance.</p></div><div className="process">{process.map(([number, title, copy], index) => <article key={number}><div className="process-number"><span>{number}</span><i>{index < process.length - 1 ? "→" : "✓"}</i></div><h3>{title}</h3><p>{copy}</p></article>)}</div></section>
 
     <section className="services section-pad" id="services" data-reveal><div className="services-title"><p className="eyebrow">Beyond equipment</p><h2>Support that keeps<br /><em>projects moving.</em></h2><p>Practical capability from specification through modernization.</p></div><div className="service-list">{services.map(([number, title, copy, image]) => <a href="#contact" className="service-row" key={number}><span>{number}</span><img src={image} alt="" /><h3>{title}</h3><p>{copy}</p><ChevronRight /></a>)}</div></section>
 
@@ -216,7 +222,7 @@ export default function Home() {
       <form className="enquiry" onSubmit={sendEnquiry}><div className="form-head"><span>Project enquiry</span><strong>Tell us what you need.</strong></div><label>Name<input required name="name" maxLength={100} placeholder="Your name" /></label><label>Company<input name="company" maxLength={120} placeholder="Company name" /></label><label>Email<input required type="email" name="email" maxLength={160} placeholder="name@company.com" /></label><label>Phone<input name="phone" maxLength={40} placeholder="Contact number" /></label><label className="full">Requirement<textarea required name="requirement" maxLength={3000} placeholder="Application, flow, head, water quality, timeline..." /></label><button className="button button-lime" type="submit" disabled={enquiryStatus === "sending"}>{enquiryStatus === "sending" ? "Sending…" : "Send email enquiry"}</button><small className={`enquiry-status ${enquiryStatus}`} role="status" aria-live="polite">{enquiryStatus === "sent" ? "Thank you. Your enquiry has been sent to GJVN." : enquiryStatus === "error" ? "The enquiry could not be sent. Please email mail@gjvn.co.in directly." : "Your enquiry will be delivered securely to the GJVN team."}</small></form>
     </section>
 
-    <footer><div className="footer-brand"><span className="brand-logo"><img src="/gjvn-logo.png" alt="GJVN" /></span><p>Integrated water, engineering and digitalization solutions.</p></div><div><strong>Solutions</strong><a href="#solutions">Pump & Skid Systems</a><a href="#solutions">Water Meter & IoT</a><a href="#solutions">Water & Wastewater</a><a href="#solutions">Desalination & ZLD</a></div><div><strong>Connect</strong><a href="mailto:mail@gjvn.co.in">mail@gjvn.co.in</a><a href="tel:+919876543210">+91 98765 43210</a><span>Baner Road, Pune</span></div><p className="copyright">© {new Date().getFullYear()} GJVN Engineering Solutions Pvt. Ltd. All rights reserved.</p></footer>
+    <footer><div className="footer-brand"><span className="brand-logo"><img src="/gjvn-logo.png" alt="GJVN" /></span><p>Integrated water, engineering and digitalization solutions.</p></div><div><strong>Solutions</strong><a href="#solutions">Pump & Skid Systems</a><a href="#solutions">Water Meter & IoT</a><a href="#solutions">Water & Wastewater</a><a href="#solutions">Desalination & ZLD</a></div><div><strong>Connect</strong><a href="mailto:mail@gjvn.co.in">mail@gjvn.co.in</a><a href="tel:+919876543210">+91 98765 43210</a><span>Baner Road, Pune</span>{visitorCount !== null && <span className="visitor-count"><Eye size={16} /><span><small>Website visitors</small>{visitorCount.toLocaleString("en-IN")}</span><i aria-hidden="true" /></span>}</div><p className="copyright">© {new Date().getFullYear()} GJVN Engineering Solutions Pvt. Ltd. All rights reserved.</p></footer>
 
     <aside ref={whatsappWidget} className={`whatsapp-widget ${whatsappPanelPlacement}${whatsappOpen ? " open" : ""}${whatsappDragging ? " dragging" : ""}${whatsappPosition ? " positioned" : ""}`} style={whatsappPosition ? { left: whatsappPosition.x, top: whatsappPosition.y, right: "auto", bottom: "auto" } : undefined} aria-live="polite">
       {whatsappOpen && <div className="whatsapp-card" role="dialog" aria-modal="false" aria-labelledby="whatsapp-title">
